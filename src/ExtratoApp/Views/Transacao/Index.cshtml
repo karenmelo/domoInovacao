@@ -1,0 +1,22 @@
+﻿@using Conta.Domain.ValueObject
+@model TransacaoViewModel
+
+
+<form class="row g-3" asp-action="NovaTransacao">
+    <div class="col-6">
+        <label class="form-label">Tipo da Transação: </label>
+        <select asp-for="Transacao.TipoTransacao" asp-items="new SelectList(Enum.GetValues(typeof(TipoTransacao)))" class="form-select"></select>
+    </div>
+    <div class="col-6">
+        <label class="form-label">Local: </label>
+        <input type="text" asp-for="Transacao.Local" class="form-control">
+    </div>
+    <div class="col-6">
+        <label class="form-label">Valor: </label>
+        <input type="text" asp-for="Transacao.Valor" class="form-control">
+    </div>
+    <div class="col-12">
+        <label class="visually-hidden"></label>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+</form>

@@ -1,0 +1,106 @@
+﻿@model ExtratoViewModel
+
+@{
+    ViewData["Title"] = "Extrato";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Extrato</h1>
+</div>
+
+@if (ViewBag.Mensagem != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Mensagem
+    </div>
+}
+
+<form class="row g-3" asp-action="Filtrar" method="get">
+    <div class="mb-3 row">
+        <label class="form-label">Quantidade de dias*: </label>
+        <div class="col-sm-3">
+            <select id="qtdDias" class="form-select" asp-for="QtdDias" name="qtdDias">
+                <option value="0">Selecione..</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary mb-3" type="submit">
+            Filtrar
+        </button>
+    </div>
+</form>
+
+
+
+@if (Model != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Data da Transação</th>
+                <th>Tipo da Transação</th>
+                <th>Valor da Transação</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transacao in Model.Extrato)
+            {
+                <tr>
+                    <td>@transacao.DataTransacao</td>
+                    <td>@transacao.TipoTransacao</td>
+                    <td>@transacao.Valor.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="col-auto">
+        <button id="btnDownload" class="btn btn-primary mb-3" type="button" onclick="baixarExtratoPdf(@Model.QtdDias)">
+            Download
+        </button>
+    </div>
+
+}
+
+
+
+
+
+
+<script>
+    function baixarExtratoPdf(dias) {
+        fetch(`/Extrato/ExportarExtrato?dias=${dias}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/pdf'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error("Erro ao gerar o PDF");
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'Extrato.pdf';
+                document.body.appendChild(a);
+                a.click();
+
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            })
+            .catch(error => {
+                console.error("Erro no download do PDF:", error);
+            });
+    }
+</script>
